@@ -1,0 +1,21 @@
+server:
+  port: ${PORT_MS}
+
+spring:
+  data:
+    mongodb:
+      host: ${MONGO_HOST}
+      port: ${MONGO_PORT}
+      database: ${MONGO_DATABASE}
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: ${MONGO_LOG} 
+
+
+    
