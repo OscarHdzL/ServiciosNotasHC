@@ -20,7 +20,7 @@ import com.example.mshcincapacidades.Service.NotaEgresoService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/mshc-notas-historial/v1")
+@RequestMapping("/mshc-nota-historial/v1")
 @RequiredArgsConstructor
 public class NotasController {
 
