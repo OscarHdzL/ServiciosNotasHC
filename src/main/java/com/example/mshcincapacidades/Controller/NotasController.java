@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.mshcincapacidades.Model.Notas.Request.DelegacionRequestNotas;
+import com.example.mshcincapacidades.Model.Notas.Request.EspecialidadRequestNotas;
 import com.example.mshcincapacidades.Model.Notas.Request.NotasRequest;
 import com.example.mshcincapacidades.Model.Notas.Request.ServicioRequestNotas;
+import com.example.mshcincapacidades.Model.Notas.Request.SolictudReferenciasRequest;
 import com.example.mshcincapacidades.Model.Notas.Request.UnidadRequestNotas;
 import com.example.mshcincapacidades.Service.NotaEgresoService;
 
@@ -33,33 +35,33 @@ public class NotasController {
         return new ResponseEntity<>(notaEgresoService.llenarListaNotas(request), HttpStatus.OK);
     }
 
-    @PostMapping("/egreso/{id}")
+    @GetMapping("/egreso/{id}")
     public ResponseEntity<Object> findNotaEgresoById(@PathVariable String id)
             throws ParseException {
 
         return new ResponseEntity<>(notaEgresoService.finNotaEgresoById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/referencia")
-    public ResponseEntity<Object> findAllReferenciasByNSS_AgregadoMedico(@RequestBody NotasRequest request)
+    @PostMapping("/referencias-contrareferencias")
+    public ResponseEntity<Object> findAllReferenciasByNSS_AgregadoMedico(@RequestBody SolictudReferenciasRequest request)
             throws ParseException {
 
-        return new ResponseEntity<>(notaEgresoService.findReferencias(), HttpStatus.OK);
+        return new ResponseEntity<>(notaEgresoService.findReferenciasNota(request), HttpStatus.OK);
     }
 
-    @PostMapping("/solicitud")
-    public ResponseEntity<Object> findAllSolicitudByNSS_AgregadoMedico(@RequestBody NotasRequest request)
+    @PostMapping("/solicitudes-servicio")
+    public ResponseEntity<Object> findAllSolicitudByNSS_AgregadoMedico(@RequestBody SolictudReferenciasRequest request)
             throws ParseException {
 
-        return new ResponseEntity<>(notaEgresoService.findSolicitud(), HttpStatus.OK);
+        return new ResponseEntity<>(notaEgresoService.findSolicitudesServicioNota(request), HttpStatus.OK);
     }
 
-    @PostMapping("/evolucion")
+/*     @PostMapping("/evolucion")
     public ResponseEntity<Object> findAllEvolucionByNSS_AgregadoMedico(@RequestBody NotasRequest request)
             throws ParseException {
 
         return new ResponseEntity<>(notaEgresoService.findEvolucion(), HttpStatus.OK);
-    }
+    } */
 
     @GetMapping("/evolucion/{id}")
     public ResponseEntity<Object> findEvolucionById(@PathVariable String id)
@@ -68,12 +70,12 @@ public class NotasController {
         return new ResponseEntity<>(notaEgresoService.findEvolucionById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/revision")
+/*     @PostMapping("/revision")
     public ResponseEntity<Object> findAllRevisionByNSS_AgregadoMedico(@RequestBody NotasRequest request)
             throws ParseException {
 
         return new ResponseEntity<>(notaEgresoService.findRevision(), HttpStatus.OK);
-    }
+    } */
 
     @GetMapping("/revision/{id}")
     public ResponseEntity<Object> findRevisionById(@PathVariable String id)
@@ -82,13 +84,13 @@ public class NotasController {
         return new ResponseEntity<>(notaEgresoService.findRevisionById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/defuncion")
+/*     @PostMapping("/defuncion")
     public ResponseEntity<Object> findAllDefuncionByNSS_AgregadoMedico(@RequestBody NotasRequest request)
             throws ParseException {
 
         return new ResponseEntity<>(notaEgresoService.findDefuncion(), HttpStatus.OK);
     }
-
+ */
     @GetMapping("/defuncion/{id}")
     public ResponseEntity<Object> findDefuncionById(@PathVariable String id)
             throws ParseException {
@@ -96,12 +98,12 @@ public class NotasController {
         return new ResponseEntity<>(notaEgresoService.findDefuncionById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/inicial")
+/*     @PostMapping("/inicial")
     public ResponseEntity<Object> findAllInicialByNSS_AgregadoMedico(@RequestBody NotasRequest request)
             throws ParseException {
 
         return new ResponseEntity<>(notaEgresoService.findInicial(), HttpStatus.OK);
-    }
+    } */
 
     @GetMapping("/inicial/{id}")
     public ResponseEntity<Object> findInicialById(@PathVariable String id)
@@ -110,12 +112,12 @@ public class NotasController {
         return new ResponseEntity<>(notaEgresoService.findInicialById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/inicial-gineco")
+/*     @PostMapping("/inicial-gineco")
     public ResponseEntity<Object> findAllInicialGinecoByNSS_AgregadoMedico(@RequestBody NotasRequest request)
             throws ParseException {
 
         return new ResponseEntity<>(notaEgresoService.findInicialGineco(), HttpStatus.OK);
-    }
+    } */
 
     @GetMapping("/inicial-gineco/{id}")
     public ResponseEntity<Object> findInicialGinecoById(@PathVariable String id)
@@ -125,8 +127,7 @@ public class NotasController {
     }
 
 
-    
-
+    /* CATALOGOS */
 
     @PostMapping("/unidades")
     public ResponseEntity<Object> findUnidades(@RequestBody UnidadRequestNotas request) throws ParseException {
@@ -142,10 +143,15 @@ public class NotasController {
     }
 
     
-
     @PostMapping("/servicio")
     public ResponseEntity<Object> findServicio(@RequestBody ServicioRequestNotas request) throws ParseException {
 
         return new ResponseEntity<>(notaEgresoService.findServicio(request), HttpStatus.OK);
+    }
+
+     @PostMapping("/especialidad")
+    public ResponseEntity<Object> findEspecialidad(@RequestBody EspecialidadRequestNotas request) throws ParseException {
+
+        return new ResponseEntity<>(notaEgresoService.findEspecialidad(request), HttpStatus.OK);
     }
 }

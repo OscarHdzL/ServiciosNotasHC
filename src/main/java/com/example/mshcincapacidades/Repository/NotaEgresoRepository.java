@@ -21,6 +21,7 @@ import com.example.mshcincapacidades.Model.Notas.NotaEvolucion;
 import com.example.mshcincapacidades.Model.Notas.Referencia;
 import com.example.mshcincapacidades.Model.Notas.ReferenciaDetail;
 import com.example.mshcincapacidades.Model.Notas.RespuestaDelegacionNotas;
+import com.example.mshcincapacidades.Model.Notas.RespuestaEspecialidadNotas;
 import com.example.mshcincapacidades.Model.Notas.RespuestaServicioNotas;
 import com.example.mshcincapacidades.Model.Notas.RespuestaUnidadNotas;
 import com.example.mshcincapacidades.Model.Notas.SolicitudServicioDetail;
@@ -104,7 +105,6 @@ List<RespuestaUnidadNotas> findUnidadesByNssAgregadoFechasDelegacion(String num_
 
 
 //SERVICIOS
-
 @Aggregation(
     pipeline = {
         "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']}]}}}",
@@ -141,6 +141,42 @@ List<RespuestaServicioNotas> findServicioByNssAgregadoDelegacionUnidad(String nu
 )
 List<RespuestaServicioNotas> findServicioByNssAgregadoFechasDelegacionUnidad(String num_nss, String agregado_medico, Date start, Date end, String delegacion,String unidad);
 
+//ESPECIALIDAD
+@Aggregation(
+    pipeline = {
+        "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']}]}}}",
+        "{'$group':{'_id':{'cve_especialidad':'$cve_especialidad'},'cve_especialidad':{'$first': '$cve_especialidad'}}},{'$sort':{'cve_especialidad':1}}"
+    }
+)
+List<RespuestaEspecialidadNotas> findEspecialidadByNssAgregado(String num_nss, String agregado_medico);
+
+@Aggregation(
+    pipeline = {
+        "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']},"+
+        "{ '$gte' : [{ '$dateFromString': { 'dateString': '$fec_nota', 'format': '%Y-%m-%d %H:%M:%S'}},?2]}, "+
+        "{ '$lt' : [{ '$dateFromString': { 'dateString': '$fec_nota', 'format': '%Y-%m-%d %H:%M:%S'}},?3]} ]}}}",
+         "{'$group':{'_id':{'cve_especialidad':'$cve_especialidad'},'cve_especialidad':{'$first': '$cve_especialidad'}}},{'$sort':{'cve_especialidad':1}}"
+        
+    }
+)
+List<RespuestaEspecialidadNotas> findEspecialidadByNssAgregadoFechas(String num_nss, String agregado_medico, Date start, Date end);
+
+
+@Aggregation(
+    pipeline = {
+        "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']},{'$regexMatch':{'input':'$des_ooad','regex':?2,'options':'i'}}, {'$regexMatch':{'input':'$des_unidad','regex':?3,'options':'i'}}, {'$regexMatch':{'input':'$cve_servicio','regex':?4,'options':'i'}}]}}}",
+         "{'$group':{'_id':{'cve_especialidad':'$cve_especialidad'},'cve_especialidad':{'$first': '$cve_especialidad'}}},{'$sort':{'cve_especialidad':1}}"
+    }
+)
+List<RespuestaEspecialidadNotas> findEspecialidadByNssAgregadoDelegacionUnidadServicio(String num_nss, String agregado_medico, String delegacion, String unidad, String servicio);
+
+@Aggregation(
+    pipeline = {
+        "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']},{ '$gte' : [{ '$dateFromString': { 'dateString': '$fec_nota', 'format': '%Y-%m-%d %H:%M:%S'}},?2]},{ '$lt' : [{ '$dateFromString': { 'dateString': '$fec_nota', 'format': '%Y-%m-%d %H:%M:%S'}},?3]},{ '$regexMatch':{'input':'$des_ooad','regex':?4,'options':'i'}}, {'$regexMatch':{'input':'$des_unidad','regex':?5,'options':'i'}}, {'$regexMatch':{'input':'$cve_servicio','regex':?6,'options':'i'}}]}}}",
+         "{'$group':{'_id':{'cve_especialidad':'$cve_especialidad'},'cve_especialidad':{'$first': '$cve_especialidad'}}},{'$sort':{'cve_especialidad':1}}"
+    }
+)
+List<RespuestaEspecialidadNotas> findEspecialidadByNssAgregadoFechasDelegacionUnidadServicio(String num_nss, String agregado_medico, Date start, Date end, String delegacion,String unidad, String servicio);
 
 
 

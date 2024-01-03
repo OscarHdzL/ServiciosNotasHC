@@ -44,12 +44,18 @@ import com.example.mshcincapacidades.Model.Notas.NotaRevision;
 import com.example.mshcincapacidades.Model.Notas.NotaRevisionDetail;
 import com.example.mshcincapacidades.Model.Notas.Referencia;
 import com.example.mshcincapacidades.Model.Notas.ReferenciaDetail;
+import com.example.mshcincapacidades.Model.Notas.RespuestaDelegacionNotas;
+import com.example.mshcincapacidades.Model.Notas.RespuestaEspecialidadNotas;
+import com.example.mshcincapacidades.Model.Notas.RespuestaServicioNotas;
+import com.example.mshcincapacidades.Model.Notas.RespuestaUnidadNotas;
 import com.example.mshcincapacidades.Model.Notas.SolicitudServicioDetail;
 import com.example.mshcincapacidades.Model.Notas.Request.DelegacionRequestNotas;
+import com.example.mshcincapacidades.Model.Notas.Request.EspecialidadRequestNotas;
 import com.example.mshcincapacidades.Model.Notas.Request.ModelDelegacionRequestNotas;
 import com.example.mshcincapacidades.Model.Notas.Request.ModelNotaRequest;
 import com.example.mshcincapacidades.Model.Notas.Request.NotasRequest;
 import com.example.mshcincapacidades.Model.Notas.Request.ServicioRequestNotas;
+import com.example.mshcincapacidades.Model.Notas.Request.SolictudReferenciasRequest;
 import com.example.mshcincapacidades.Model.Notas.Request.UnidadRequestNotas;
 import com.example.mshcincapacidades.Repository.IncapacidadNSSARepository;
 import com.example.mshcincapacidades.Repository.NotaDefuncionRepository;
@@ -104,11 +110,11 @@ public class NotaEgresoService {
     }
 
 
-    public Object findDelegaciones(DelegacionRequestNotas request){
+    public List<RespuestaDelegacionNotas> findDelegaciones(DelegacionRequestNotas request){
         return notaEgresoRepository.findDelegacionesByNssAgregado(request.getModel().getNum_nss(), request.getModel().getAgregado_medico());
     }
 
-    public Object findUnidades(UnidadRequestNotas request) throws ParseException {
+    public List<RespuestaUnidadNotas> findUnidades(UnidadRequestNotas request) throws ParseException {
 
         if (request.getModel().getStart() != null && request.getModel().getEnd() != null
                 && request.getModel().getDes_ooad() == null) {
@@ -162,7 +168,7 @@ public class NotaEgresoService {
 
 
 
-    public Object findServicio(ServicioRequestNotas request) throws ParseException {
+    public List<RespuestaServicioNotas> findServicio(ServicioRequestNotas request) throws ParseException {
 
         if (request.getModel().getStart() != null && request.getModel().getEnd() != null
                 && request.getModel().getDes_ooad() == null && request.getModel().getDes_unidad() == null) {
@@ -202,6 +208,51 @@ public class NotaEgresoService {
                     request.getModel().getAgregado_medico(), request.getModel().getDes_ooad(), request.getModel().getDes_unidad());
         } else {
             return notaEgresoRepository.findServicioByNssAgregado(request.getModel().getNum_nss(),
+                    request.getModel().getAgregado_medico());
+        }
+
+    }
+
+    public List<RespuestaEspecialidadNotas> findEspecialidad(EspecialidadRequestNotas request) throws ParseException {
+
+        if (request.getModel().getStart() != null && request.getModel().getEnd() != null
+                && request.getModel().getDes_ooad() == null && request.getModel().getDes_unidad() == null && request.getModel().getCve_servicio() == null) {
+
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date fromDate = dateFormat.parse(request.getModel().getStart());
+            Date toDate = dateFormat.parse(request.getModel().getEnd());
+
+            Calendar c1 = Calendar.getInstance();
+            c1.setTime(toDate);
+            c1.add(Calendar.DATE, 1);
+            toDate = c1.getTime();
+
+            // Formato entrada => "1/1/2021"
+
+            return notaEgresoRepository.findEspecialidadByNssAgregadoFechas(request.getModel().getNum_nss(),
+                    request.getModel().getAgregado_medico(), fromDate, toDate);
+
+        } else if (request.getModel().getStart() != null && request.getModel().getEnd() != null
+                && request.getModel().getDes_ooad() != null && request.getModel().getDes_unidad() != null && request.getModel().getCve_servicio() != null) {
+
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date fromDate = dateFormat.parse(request.getModel().getStart());
+            Date toDate = dateFormat.parse(request.getModel().getEnd());
+
+            Calendar c1 = Calendar.getInstance();
+            c1.setTime(toDate);
+            c1.add(Calendar.DATE, 1);
+            toDate = c1.getTime();
+
+            return notaEgresoRepository.findEspecialidadByNssAgregadoFechasDelegacionUnidadServicio(request.getModel().getNum_nss(),
+                    request.getModel().getAgregado_medico(), fromDate, toDate, request.getModel().getDes_ooad(), request.getModel().getDes_unidad(), request.getModel().getCve_servicio());
+        } else if (request.getModel().getStart() == null && request.getModel().getEnd() == null
+                && request.getModel().getDes_ooad() != null && request.getModel().getDes_unidad() != null && request.getModel().getCve_servicio() != null) {
+
+            return notaEgresoRepository.findEspecialidadByNssAgregadoDelegacionUnidadServicio(request.getModel().getNum_nss(),
+                    request.getModel().getAgregado_medico(), request.getModel().getDes_ooad(), request.getModel().getDes_unidad(), request.getModel().getCve_servicio());
+        } else {
+            return notaEgresoRepository.findEspecialidadByNssAgregado(request.getModel().getNum_nss(),
                     request.getModel().getAgregado_medico());
         }
 
@@ -578,12 +629,13 @@ public class NotaEgresoService {
         return notaEgresoRepository.findNotaEgresoById(id);
     }
 
-    public List<ReferenciaDetail> findNotasReferencia(String num_nss, String agregado_medico, String num_exp_folio, String num_exp_anio, String num_exp_unidado){
-        return notaEgresoRepository.findNotasReferencia(num_nss, agregado_medico, num_exp_folio, num_exp_anio, num_exp_unidado);
+    public List<SolicitudServicioDetail> findSolicitudesServicioNota(SolictudReferenciasRequest request){
+        
+        return notaEgresoRepository.findNotasSolicitudServicio(request.getNum_nss(),request.getAgregado_medico(), request.getNum_exp_folio(), request.getNum_exp_anio(), request.getNum_exp_unidado());
     }
 
-    public List<SolicitudServicioDetail> findNotasSolicitudServicio(String num_nss, String agregado_medico, String num_exp_folio, String num_exp_anio, String num_exp_unidado){
-        return notaEgresoRepository.findNotasSolicitudServicio(num_nss, agregado_medico, num_exp_folio, num_exp_anio, num_exp_unidado);
+    public List<ReferenciaDetail> findReferenciasNota(SolictudReferenciasRequest request){
+        return notaEgresoRepository.findNotasReferencia(request.getNum_nss(),request.getAgregado_medico(), request.getNum_exp_folio(), request.getNum_exp_anio(), request.getNum_exp_unidado());
     }
 
 
