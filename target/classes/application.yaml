@@ -9,6 +9,9 @@ spring:
       database: ${MONGO_DATABASE}
       username: ${MONGO_USERNAME}
       password: ${MONGO_PASSWORD}
+    mvc:
+      pathmatch:
+            matching-strategy: ant_path_matcher
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false

@@ -21,6 +21,7 @@ import com.example.mshcincapacidades.Model.Notas.NotaEvolucion;
 import com.example.mshcincapacidades.Model.Notas.Referencia;
 import com.example.mshcincapacidades.Model.Notas.ReferenciaDetail;
 import com.example.mshcincapacidades.Model.Notas.RespuestaDelegacionNotas;
+import com.example.mshcincapacidades.Model.Notas.RespuestaServicioNotas;
 import com.example.mshcincapacidades.Model.Notas.RespuestaUnidadNotas;
 import com.example.mshcincapacidades.Model.Notas.SolicitudServicioDetail;
 
@@ -55,7 +56,7 @@ List<NotaEgreso> findNotasEgresoByNssAgregadoPaginado(String num_nss, String agr
 
 @Aggregation(
     pipeline = {
-        "{'$match':{'$and':[{'cve_pac_nss':?0},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']}]}}",
+        "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']}]}}}",
         "{'$group':{'_id':{'des_ooad':{ '$toUpper': '$des_ooad' }},'des_ooad':{'$first': { '$toUpper': '$des_ooad' } }}},{'$sort':{'des_ooad':1}}"
     }
 )
@@ -67,7 +68,7 @@ List<RespuestaDelegacionNotas> findDelegacionesByNssAgregado(String num_nss, Str
 
 @Aggregation(
     pipeline = {
-        "{'$match':{'$and':[{'cve_pac_nss':?0},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']}]}}",
+        "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']}]}}}",
         "{'$group':{'_id':{'des_unidad':'$des_unidad'},'des_unidad':{'$first': '$des_unidad'}}},{'$sort':{'des_unidad':1}}"
     }
 )
@@ -100,6 +101,49 @@ List<RespuestaUnidadNotas> findUnidadesByNssAgregadoDelegacion(String num_nss, S
     }
 )
 List<RespuestaUnidadNotas> findUnidadesByNssAgregadoFechasDelegacion(String num_nss, String agregado_medico, Date start, Date end, String delegacion);
+
+
+//SERVICIOS
+
+@Aggregation(
+    pipeline = {
+        "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']}]}}}",
+        "{'$group':{'_id':{'cve_servicio':'$cve_servicio'},'cve_servicio':{'$first': '$cve_servicio'}}},{'$sort':{'cve_servicio':1}}"
+    }
+)
+List<RespuestaServicioNotas> findServicioByNssAgregado(String num_nss, String agregado_medico);
+
+@Aggregation(
+    pipeline = {
+        "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']},"+
+        "{ '$gte' : [{ '$dateFromString': { 'dateString': '$fec_nota', 'format': '%Y-%m-%d %H:%M:%S'}},?2]}, "+
+        "{ '$lt' : [{ '$dateFromString': { 'dateString': '$fec_nota', 'format': '%Y-%m-%d %H:%M:%S'}},?3]} ]}}}",
+         "{'$group':{'_id':{'cve_servicio':'$cve_servicio'},'cve_servicio':{'$first': '$cve_servicio'}}},{'$sort':{'cve_servicio':1}}"
+        
+    }
+)
+List<RespuestaServicioNotas> findServicioByNssAgregadoFechas(String num_nss, String agregado_medico, Date start, Date end);
+
+
+@Aggregation(
+    pipeline = {
+        "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']},{'$regexMatch':{'input':'$des_ooad','regex':?2,'options':'i'}}, {'$regexMatch':{'input':'$des_unidad','regex':?3,'options':'i'}}]}}}",
+         "{'$group':{'_id':{'cve_servicio':'$cve_servicio'},'cve_servicio':{'$first': '$cve_servicio'}}},{'$sort':{'cve_servicio':1}}"
+    }
+)
+List<RespuestaServicioNotas> findServicioByNssAgregadoDelegacionUnidad(String num_nss, String agregado_medico, String delegacion, String unidad);
+
+@Aggregation(
+    pipeline = {
+        "{'$match':{'$expr':{'$and':[{'$eq':['$cve_pac_nss',?0]},{'$eq':['$cve_pac_amedico',?1]}, {'$eq':['$cve_exp_cvesol','76']},{'$eq':['$cve_estatus_expediente','A']},{ '$gte' : [{ '$dateFromString': { 'dateString': '$fec_nota', 'format': '%Y-%m-%d %H:%M:%S'}},?2]},{ '$lt' : [{ '$dateFromString': { 'dateString': '$fec_nota', 'format': '%Y-%m-%d %H:%M:%S'}},?3]},{ '$regexMatch':{'input':'$des_ooad','regex':?4,'options':'i'}}, {'$regexMatch':{'input':'$des_unidad','regex':?5,'options':'i'}}]}}}",
+         "{'$group':{'_id':{'cve_servicio':'$cve_servicio'},'cve_servicio':{'$first': '$cve_servicio'}}},{'$sort':{'cve_servicio':1}}"
+    }
+)
+List<RespuestaServicioNotas> findServicioByNssAgregadoFechasDelegacionUnidad(String num_nss, String agregado_medico, Date start, Date end, String delegacion,String unidad);
+
+
+
+
 
 
 ////NOTAS TEST

@@ -49,6 +49,7 @@ import com.example.mshcincapacidades.Model.Notas.Request.DelegacionRequestNotas;
 import com.example.mshcincapacidades.Model.Notas.Request.ModelDelegacionRequestNotas;
 import com.example.mshcincapacidades.Model.Notas.Request.ModelNotaRequest;
 import com.example.mshcincapacidades.Model.Notas.Request.NotasRequest;
+import com.example.mshcincapacidades.Model.Notas.Request.ServicioRequestNotas;
 import com.example.mshcincapacidades.Model.Notas.Request.UnidadRequestNotas;
 import com.example.mshcincapacidades.Repository.IncapacidadNSSARepository;
 import com.example.mshcincapacidades.Repository.NotaDefuncionRepository;
@@ -102,6 +103,11 @@ public class NotaEgresoService {
         // request.getModel().getAgregado_medico());
     }
 
+
+    public Object findDelegaciones(DelegacionRequestNotas request){
+        return notaEgresoRepository.findDelegacionesByNssAgregado(request.getModel().getNum_nss(), request.getModel().getAgregado_medico());
+    }
+
     public Object findUnidades(UnidadRequestNotas request) throws ParseException {
 
         if (request.getModel().getStart() != null && request.getModel().getEnd() != null
@@ -119,19 +125,6 @@ public class NotaEgresoService {
             // Formato entrada => "1/1/2021"
             String[] splitStart = request.getModel().getStart().split("/");
             String[] splitEnd = request.getModel().getEnd().split("/");
-
-            // Change to format => 2023-12-01
-
-            // String fromDate = splitStart[2] + "-" + String.format("%02d", splitStart[1])
-            // + "-" + String.format("%02d", splitStart[0]);
-            /*
-             * String fromDate = splitStart[2] + "-" + String.format("%02d",
-             * Integer.parseInt(splitStart[1])) + "-" + String.format("%02d",
-             * Integer.parseInt(splitStart[0]));
-             * String toDate = splitEnd[2] + "-" + String.format("%02d",
-             * Integer.parseInt(splitEnd[1])) + "-" + String.format("%02d",
-             * Integer.parseInt(splitEnd[0]));
-             */
 
             return notaEgresoRepository.findUnidadesByNssAgregadoFechas(request.getModel().getNum_nss(),
                     request.getModel().getAgregado_medico(), fromDate, toDate);
@@ -151,19 +144,7 @@ public class NotaEgresoService {
             String[] splitStart = request.getModel().getStart().split("/");
             String[] splitEnd = request.getModel().getEnd().split("/");
 
-            // Change to format => 2023-12-01
 
-            // String fromDate = splitStart[2] + "-" + String.format("%02d", splitStart[1])
-            // + "-" + String.format("%02d", splitStart[0]);
-            /*
-             * String fromDate = splitStart[2] + "-" + String.format("%02d",
-             * Integer.parseInt(splitStart[1])) + "-" + String.format("%02d",
-             * Integer.parseInt(splitStart[0]));
-             * String toDate = splitEnd[2] + "-" + String.format("%02d",
-             * Integer.parseInt(splitEnd[1])) + "-" + String.format("%02d",
-             * Integer.parseInt(splitEnd[0]));
-             * 
-             */
 
             return notaEgresoRepository.findUnidadesByNssAgregadoFechasDelegacion(request.getModel().getNum_nss(),
                     request.getModel().getAgregado_medico(), fromDate, toDate, request.getModel().getDes_ooad());
@@ -177,9 +158,53 @@ public class NotaEgresoService {
                     request.getModel().getAgregado_medico());
         }
 
-        // return
-        // notaEgresoRepository.findDelegacionesByNssAgregado(request.getModel().getNum_nss(),
-        // request.getModel().getAgregado_medico());
+    }
+
+
+
+    public Object findServicio(ServicioRequestNotas request) throws ParseException {
+
+        if (request.getModel().getStart() != null && request.getModel().getEnd() != null
+                && request.getModel().getDes_ooad() == null && request.getModel().getDes_unidad() == null) {
+
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date fromDate = dateFormat.parse(request.getModel().getStart());
+            Date toDate = dateFormat.parse(request.getModel().getEnd());
+
+            Calendar c1 = Calendar.getInstance();
+            c1.setTime(toDate);
+            c1.add(Calendar.DATE, 1);
+            toDate = c1.getTime();
+
+            // Formato entrada => "1/1/2021"
+
+            return notaEgresoRepository.findServicioByNssAgregadoFechas(request.getModel().getNum_nss(),
+                    request.getModel().getAgregado_medico(), fromDate, toDate);
+
+        } else if (request.getModel().getStart() != null && request.getModel().getEnd() != null
+                && request.getModel().getDes_ooad() != null && request.getModel().getDes_unidad() != null) {
+
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date fromDate = dateFormat.parse(request.getModel().getStart());
+            Date toDate = dateFormat.parse(request.getModel().getEnd());
+
+            Calendar c1 = Calendar.getInstance();
+            c1.setTime(toDate);
+            c1.add(Calendar.DATE, 1);
+            toDate = c1.getTime();
+
+            return notaEgresoRepository.findServicioByNssAgregadoFechasDelegacionUnidad(request.getModel().getNum_nss(),
+                    request.getModel().getAgregado_medico(), fromDate, toDate, request.getModel().getDes_ooad(), request.getModel().getDes_unidad());
+        } else if (request.getModel().getStart() == null && request.getModel().getEnd() == null
+                && request.getModel().getDes_ooad() != null && request.getModel().getDes_unidad() != null) {
+
+            return notaEgresoRepository.findServicioByNssAgregadoDelegacionUnidad(request.getModel().getNum_nss(),
+                    request.getModel().getAgregado_medico(), request.getModel().getDes_ooad(), request.getModel().getDes_unidad());
+        } else {
+            return notaEgresoRepository.findServicioByNssAgregado(request.getModel().getNum_nss(),
+                    request.getModel().getAgregado_medico());
+        }
+
     }
 
     /// NOTAS

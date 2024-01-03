@@ -4,17 +4,16 @@ import java.text.ParseException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.mshcincapacidades.Model.DelegacionRequest;
-import com.example.mshcincapacidades.Model.UnidadRequest;
 import com.example.mshcincapacidades.Model.Notas.Request.DelegacionRequestNotas;
-import com.example.mshcincapacidades.Model.Notas.Request.ModelDelegacionRequestNotas;
 import com.example.mshcincapacidades.Model.Notas.Request.NotasRequest;
+import com.example.mshcincapacidades.Model.Notas.Request.ServicioRequestNotas;
 import com.example.mshcincapacidades.Model.Notas.Request.UnidadRequestNotas;
 import com.example.mshcincapacidades.Service.NotaEgresoService;
 
@@ -62,7 +61,7 @@ public class NotasController {
         return new ResponseEntity<>(notaEgresoService.findEvolucion(), HttpStatus.OK);
     }
 
-    @PostMapping("/evolucion/{id}")
+    @GetMapping("/evolucion/{id}")
     public ResponseEntity<Object> findEvolucionById(@PathVariable String id)
             throws ParseException {
 
@@ -76,7 +75,7 @@ public class NotasController {
         return new ResponseEntity<>(notaEgresoService.findRevision(), HttpStatus.OK);
     }
 
-    @PostMapping("/revision/{id}")
+    @GetMapping("/revision/{id}")
     public ResponseEntity<Object> findRevisionById(@PathVariable String id)
             throws ParseException {
 
@@ -90,7 +89,7 @@ public class NotasController {
         return new ResponseEntity<>(notaEgresoService.findDefuncion(), HttpStatus.OK);
     }
 
-    @PostMapping("/defuncion/{id}")
+    @GetMapping("/defuncion/{id}")
     public ResponseEntity<Object> findDefuncionById(@PathVariable String id)
             throws ParseException {
 
@@ -104,7 +103,7 @@ public class NotasController {
         return new ResponseEntity<>(notaEgresoService.findInicial(), HttpStatus.OK);
     }
 
-    @PostMapping("/inicial/{id}")
+    @GetMapping("/inicial/{id}")
     public ResponseEntity<Object> findInicialById(@PathVariable String id)
             throws ParseException {
 
@@ -118,7 +117,7 @@ public class NotasController {
         return new ResponseEntity<>(notaEgresoService.findInicialGineco(), HttpStatus.OK);
     }
 
-    @PostMapping("/inicial-gineco/{id}")
+    @GetMapping("/inicial-gineco/{id}")
     public ResponseEntity<Object> findInicialGinecoById(@PathVariable String id)
             throws ParseException {
 
@@ -126,9 +125,27 @@ public class NotasController {
     }
 
 
+    
+
+
     @PostMapping("/unidades")
     public ResponseEntity<Object> findUnidades(@RequestBody UnidadRequestNotas request) throws ParseException {
 
         return new ResponseEntity<>(notaEgresoService.findUnidades(request), HttpStatus.OK);
+    }
+
+
+        @PostMapping("/delegaciones")
+    public ResponseEntity<Object> findDelegaciones(@RequestBody DelegacionRequestNotas request) throws ParseException {
+
+        return new ResponseEntity<>(notaEgresoService.findDelegaciones(request), HttpStatus.OK);
+    }
+
+    
+
+    @PostMapping("/servicio")
+    public ResponseEntity<Object> findServicio(@RequestBody ServicioRequestNotas request) throws ParseException {
+
+        return new ResponseEntity<>(notaEgresoService.findServicio(request), HttpStatus.OK);
     }
 }
