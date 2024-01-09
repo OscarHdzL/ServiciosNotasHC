@@ -402,8 +402,14 @@ public class NotaEgresoService {
      public Integer findCountNotasEgresoNssAgregado(NotasRequest request) throws ParseException {
 
     
-        return notaEgresoRepository.contadorNotasEgresoByNssAgregado(request.getModel().getNum_nss(),
+        Integer contador = notaEgresoRepository.contadorNotasEgresoByNssAgregado(request.getModel().getNum_nss(),
                 request.getModel().getAgregado_medico());
+
+                if(contador == null){
+                    contador = 0;
+                }
+
+                return contador;
 
     }
 
